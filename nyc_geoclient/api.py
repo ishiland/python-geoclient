@@ -6,7 +6,7 @@ nyc_geoclient.api
 
 import requests
 
-from urllib import urlencode
+# from urllib import urlencode
 
 class Geoclient(object):
     """
@@ -50,11 +50,11 @@ class Geoclient(object):
         })
 
         # Ensure no 'None' values are sent to server
-        for k in kwargs.keys():
+        for k in list(kwargs.keys()):
             if kwargs[k] is None:
                 kwargs.pop(k)
 
-        return requests.get(u'{0}{1}.json?{2}'.format(Geoclient.BASE_URL, endpoint, urlencode(kwargs))).json()[endpoint]
+        return requests.get('{}{}'.format(Geoclient.BASE_URL, endpoint), params=kwargs).json()[endpoint]
 
     def address(self, houseNumber, street, borough):
         """
