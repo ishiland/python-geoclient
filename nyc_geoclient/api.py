@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
-
-"""
-nyc_geoclient.api
-"""
-
+import os
 import requests
+from nyc_geoclient.config import BASE_URL, USER_CONFIG
 
-# from urllib import urlencode
+try:
+    from configparser import ConfigParser # Python 3
+except ImportError:
+    from ConfigParser import ConfigParser # Python 2
 
 class Geoclient(object):
     """
@@ -29,19 +28,34 @@ class Geoclient(object):
         Your NYC Geoclient application ID.
     :param app_key:
         Your NYC Geoclient application key.
+    :param proxies (optional):
+        A dictionary object of proxies.
     """
 
-    BASE_URL = u'https://api.cityofnewyork.us/geoclient/v1/'
+    BASE_URL = BASE_URL
 
-    def __init__(self, app_id, app_key):
-        if not app_id:
-            raise Exception("Missing app_id")
+    def __init__(self, app_id=None, app_key=None, proxies=None):
 
-        if not app_key:
-            raise Exception("Missing app_key")
+        config = ConfigParser()
+        config.read(os.path.expanduser(USER_CONFIG))
+
+        if (app_id is None or app_key is None) and config.has_section('GEOCLIENT'):
+            credentials = dict(config.items('GEOCLIENT'))
+            app_id = credentials['id']
+            app_key = credentials['key']
+
+        if proxies is None and config.has_section('PROXIES'):
+            proxies = dict(config.items('PROXIES'))
 
         self.app_id = app_id
         self.app_key = app_key
+        self.proxies = proxies
+
+        if not self.app_id:
+            raise Exception("Missing app_id")
+
+        if not self.app_key:
+            raise Exception("Missing app_key")
 
     def _request(self, endpoint, **kwargs):
         kwargs.update({
@@ -54,7 +68,11 @@ class Geoclient(object):
             if kwargs[k] is None:
                 kwargs.pop(k)
 
-        return requests.get('{}{}'.format(Geoclient.BASE_URL, endpoint), params=kwargs).json()[endpoint]
+        key = 'results' if endpoint == "search" else endpoint
+
+        return requests.get('{}{}'.format(Geoclient.BASE_URL, endpoint),
+                            params=kwargs,
+                            proxies=self.proxies).json()[key]
 
     def address(self, houseNumber, street, borough):
         """
@@ -122,8 +140,8 @@ class Geoclient(object):
         return self._request(u'bin', bin=bin)
 
     def blockface(self, onStreet, crossStreetOne, crossStreetTwo, borough,
-                 boroughCrossStreetOne=None, boroughCrossStreetTwo=None,
-                 compassDirection=None):
+                  boroughCrossStreetOne=None, boroughCrossStreetTwo=None,
+                  compassDirection=None):
         """
         Given a valid borough, "on street" and cross streets provides
         blockface-level information.
@@ -158,7 +176,7 @@ class Geoclient(object):
                              compassDirection=compassDirection)
 
     def intersection(self, crossStreetOne, crossStreetTwo, borough,
-                    boroughCrossStreetTwo=None, compassDirection=None):
+                     boroughCrossStreetTwo=None, compassDirection=None):
         """
         Given a valid borough and cross streets returns information for the
         point defined by the two streets.
@@ -169,8 +187,8 @@ class Geoclient(object):
             Second cross street
         :param borough:
             Borough of first cross street or of all cross streets if no other
-            borough parameter is supplied.  Must be 'Bronx', 'Brooklyn',
-            'Manhattan', 'Queens', or 'Staten Island' (case-insensitive).
+            borough parameter is supplied. Must be 'Bronx', 'Brooklyn', 'Manhattan', 'Queens', or 'Staten
+            Island' or well known abbreviation.
         :param boroughCrossStreetTwo:
             (optional) Borough of second cross street. If not supplied, assumed
             to be same as borough parameter.  Must be 'Bronx', 'Brooklyn',
@@ -195,8 +213,58 @@ class Geoclient(object):
             Place name of well-known NYC location.
         :param borough:
             Must be 'Bronx', 'Brooklyn', 'Manhattan', 'Queens', or 'Staten
-            Island' (case-insensitive).
+            Island' or well known abbreviation.
 
         :returns: A dict with place-level information.
         """
         return self._request(u'place', name=name, borough=borough)
+
+    def search(self,
+               input,
+               exactMatchForSingleSuccess=None,
+               exactMatchMaxLevel=None,
+               returnPolicy=None,
+               returnPossiblesWithExact=None,
+               returnRejections=None,
+               returnTokens=None,
+               similarNamesDistance=None):
+        """
+        From https://api.cityofnewyork.us/geoclient/v1/doc#section-1.3:
+        Beginning with version 1.10, any of the six request types documented in section 1.2 can be accessed using a
+        single unparsed location string. Assuming that the Geoclient parser can guess the location type requested and
+        the given single-field input parameter contains contains enough information to generate a successful Geosupport
+        call, the service will return one or more sets of geocodes corresponding to the type of request that was made.
+       :param input:
+            Unparsed location input.
+        :param exactMatchForSingleSuccess:
+            (optional) Whether a search returning only one possible successfully geocoded
+            location is considered an exact match. Defaults to false.
+        :param exactMatchMaxLevel:
+            (optional) The maximum number of sub-search levels to perform if Geosupport
+            rejects the input but suggests alternative street names, etc.
+            Defaults to 3. Maximum is allowable value is 6.
+        :param returnPolicy:
+            (optional) Whether to return information on the search policy used to perform the search.
+            Defaults to false.
+        :param returnPossiblesWithExact:
+            (optional) Whether to also return successfully geocoded possible matches
+            when available in addition to the exact match. Defaults to false.
+        :param returnRejections:
+            (optional) Whether to return rejected response data from Geosupport. Defaults to false.
+        :param returnTokens:
+            (optional) Whether to return the parsed input tokens recognized by the parser. Defaults to false.
+        :param similarNamesDistance:
+            (optional) Maximum allowable Levenshtein distance between user input
+            and a similar name suggestion from Geosupport. Defaults to 8.
+            A higher number will allow more "guesses" to be made about an unrecognized street name.
+        :returns: List of geocodes corresponding to the type of request that was made.
+        """
+        return self._request(u'search',
+                             input=input,
+                             exactMatchForSingleSuccess=exactMatchForSingleSuccess,
+                             exactMatchMaxLevel=exactMatchMaxLevel,
+                             returnPolicy=returnPolicy,
+                             returnPossiblesWithExact=returnPossiblesWithExact,
+                             returnRejections=returnRejections,
+                             returnTokens=returnTokens,
+                             similarNamesDistance=similarNamesDistance)
