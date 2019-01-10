@@ -21,7 +21,7 @@ import os
 sys.path.insert(0, os.path.abspath('..'))
 
 import nyc_geoclient
-from nyc_geoclient.version import __version__
+from nyc_geoclient.config import __version__
 
 #
 # -- General configuration ------------------------------------------------
