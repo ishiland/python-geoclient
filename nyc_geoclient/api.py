@@ -1,11 +1,14 @@
 import os
 import requests
-from nyc_geoclient.config import BASE_URL, USER_CONFIG
 
 try:
-    from configparser import ConfigParser # Python 3
+    from configparser import ConfigParser  # Python 3
 except ImportError:
-    from ConfigParser import ConfigParser # Python 2
+    from ConfigParser import ConfigParser  # Python 2
+
+from nyc_geoclient.config import BASE_URL, USER_CONFIG
+from .error import GeoclientError
+
 
 class Geoclient(object):
     """
@@ -47,15 +50,15 @@ class Geoclient(object):
         if proxies is None and config.has_section('PROXIES'):
             proxies = dict(config.items('PROXIES'))
 
+        if not app_id:
+            raise GeoclientError("Missing app_id")
+
+        if not app_key:
+            raise GeoclientError("Missing app_key")
+
         self.app_id = app_id
         self.app_key = app_key
         self.proxies = proxies
-
-        if not self.app_id:
-            raise Exception("Missing app_id")
-
-        if not self.app_key:
-            raise Exception("Missing app_key")
 
     def _request(self, endpoint, **kwargs):
         kwargs.update({
@@ -70,9 +73,14 @@ class Geoclient(object):
 
         key = 'results' if endpoint == "search" else endpoint
 
-        return requests.get('{}{}'.format(Geoclient.BASE_URL, endpoint),
-                            params=kwargs,
-                            proxies=self.proxies).json()[key]
+        r = requests.get('{}{}'.format(Geoclient.BASE_URL, endpoint),
+                         params=kwargs,
+                         proxies=self.proxies)
+
+        if r.status_code == 200:
+            return r.json()[key]
+        else:
+            raise GeoclientError("{} {}".format(r.status_code, r.reason))
 
     def address(self, houseNumber, street, borough):
         """

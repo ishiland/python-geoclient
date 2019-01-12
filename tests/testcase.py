@@ -9,4 +9,6 @@ class TestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        # cls.geoclient = Geoclient()
+
         cls.geoclient = Geoclient(app_key='my-app-key', app_id='my-app-id')

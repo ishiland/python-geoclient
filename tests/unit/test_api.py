@@ -9,9 +9,8 @@ except ImportError:
 
 @mock.patch('nyc_geoclient.requests.get')
 class TestApi(TestCase):
-
     def test_address(self, fake_get):
-
+        fake_get.return_value.status_code = 200
         fake_get.return_value.json.return_value = address_response
 
         result = self.geoclient.address(
@@ -26,7 +25,7 @@ class TestApi(TestCase):
         }, result)
 
     def test_address_zip(self, fake_get):
-
+        fake_get.return_value.status_code = 200
         fake_get.return_value.json.return_value = address_zip_response
 
         result = self.geoclient.address_zip(
@@ -41,7 +40,7 @@ class TestApi(TestCase):
         }, result)
 
     def test_bbl(self, fake_get):
-
+        fake_get.return_value.status_code = 200
         fake_get.return_value.json.return_value = bbl_response
 
         result = self.geoclient.bbl(
@@ -56,7 +55,7 @@ class TestApi(TestCase):
         }, result)
 
     def test_bin(self, fake_get):
-
+        fake_get.return_value.status_code = 200
         fake_get.return_value.json.return_value = bin_response
 
         result = self.geoclient.bin(
@@ -69,7 +68,7 @@ class TestApi(TestCase):
         }, result)
 
     def test_blockface(self, fake_get):
-
+        fake_get.return_value.status_code = 200
         fake_get.return_value.json.return_value = blockface_response
 
         result = self.geoclient.blockface(
@@ -85,7 +84,7 @@ class TestApi(TestCase):
         }, result)
 
     def test_intersection(self, fake_get):
-
+        fake_get.return_value.status_code = 200
         fake_get.return_value.json.return_value = intersection_response
 
         result = self.geoclient.intersection(
@@ -100,7 +99,7 @@ class TestApi(TestCase):
         }, result)
 
     def test_place(self, fake_get):
-
+        fake_get.return_value.status_code = 200
         fake_get.return_value.json.return_value = place_response
 
         result = self.geoclient.place(
@@ -114,7 +113,7 @@ class TestApi(TestCase):
         }, result)
 
     def test_search(self, fake_get):
-
+        fake_get.return_value.status_code = 200
         fake_get.return_value.json.return_value = search_response
 
         result = self.geoclient.search(
