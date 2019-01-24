@@ -19,7 +19,7 @@ location string. It also provides informative error messages in cases where the 
 .. _nyc_geoclient: https://github.com/talos/nyc-geoclient
 
 Whats New?
-==========
+----------
 This library is an updated and maintained fork of `nyc_geoclient`_. It has been updated with the following features:
 
  - Python 3 compatibility
@@ -30,7 +30,7 @@ This library is an updated and maintained fork of `nyc_geoclient`_. It has been 
 
 
 Installation
-============
+------------
 
 To use the library, you must first obtain your own unique `App` and `Id` key from the NYC Developer Portal. Once you have those credentials,
 you can install by simply running:
@@ -44,7 +44,7 @@ or you can clone the github_ repo and run:
 .. _github: https://github.com/ishiland/python-geoclient
 
 Contents
-========
+--------
 
 .. toctree::
    :maxdepth: 2
@@ -56,7 +56,7 @@ Contents
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
