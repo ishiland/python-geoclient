@@ -1,12 +1,10 @@
 import os
-import requests
-
 try:
     from configparser import ConfigParser  # Python 3
 except ImportError:
     from ConfigParser import ConfigParser  # Python 2
-
-from nyc_geoclient.config import BASE_URL, USER_CONFIG
+import requests
+from geoclient.config import BASE_URL, USER_CONFIG
 from .error import GeoclientError
 
 
@@ -18,21 +16,15 @@ class Geoclient(object):
     (http://developer.cityofnewyork.us/api/geoclient-api-beta), and make sure
     that you check off access to the Geoclient API for the application.  Take
     note of the Application's ID and key.  You will not be able to use the ID
-    and key until DoITT approves you -- this could take several days, and you
-    will receive an email when this happens.  There isn't any indication of
-    your status on the dashboard, but all requests will return a 403 until you
+    and key until DoITT approves you. All requests will return a ``403`` until you
     are approved.
-
-    All methods return a dict, whether or not the geocoding succeeded.  If it
-    failed, the dict will have a `message` key with information on why it
-    failed.
 
     :param app_id:
         Your NYC Geoclient application ID.
     :param app_key:
         Your NYC Geoclient application key.
-    :param proxies (optional):
-        A dictionary object of proxies.
+    :param proxies:
+        (optional) A dictionary of proxies.
     """
 
     BASE_URL = BASE_URL
@@ -77,8 +69,18 @@ class Geoclient(object):
                          params=kwargs,
                          proxies=self.proxies)
 
-        if r.status_code == 200:
-            return r.json()[key]
+        if r.status_code == requests.codes.ok:
+            result = r.json()[key]
+
+            if isinstance(result, dict):
+                return_code = result['geosupportReturnCode']
+                if not return_code.isdigit() or int(return_code) > 1:
+                    raise GeoclientError(
+                        result['message'] + ' ' + result['message2'],
+                        result
+                    )
+            return result
+
         else:
             raise GeoclientError("{} {}".format(r.status_code, r.reason))
 
@@ -92,12 +94,12 @@ class Geoclient(object):
         :param street:
             The name of the street to look up.
         :param borough:
-            The borough to look within.  Must be 'Bronx', 'Brooklyn',
-            'Manhattan', 'Queens', or 'Staten Island' (case-insensitive).
+            The borough to look within. Can be a valid Borough name, numeric value (1-5) or common borough abbreviation.
 
         :returns: A dict with blockface-level, property-level, and political
             information.
         """
+
         return self._request(u'address', houseNumber=houseNumber, street=street,
                              borough=borough)
 
@@ -114,8 +116,8 @@ class Geoclient(object):
 
         :returns: A dict with blockface-level, property-level, and political
             information.
-
         """
+
         return self._request(u'address', houseNumber=houseNumber, street=street, zip=zip)
 
     def bbl(self, borough, block, lot):
@@ -124,8 +126,7 @@ class Geoclient(object):
         information.
 
         :param borough:
-            The borough to look within.  Must be 'Bronx', 'Brooklyn',
-            'Manhattan', 'Queens', or 'Staten Island' (case-insensitive).
+            The borough to look within. Can be a valid Borough name, numeric value (1-5) or common borough abbreviation.
         :param block:
             The tax block to look up.
         :param lot:
@@ -133,6 +134,7 @@ class Geoclient(object):
 
         :returns: A dict with property-level information.
         """
+
         return self._request(u'bbl', borough=borough, block=block, lot=lot)
 
     def bin(self, bin):
@@ -145,6 +147,7 @@ class Geoclient(object):
 
         :returns: A dict with property-level information.
         """
+
         return self._request(u'bin', bin=bin)
 
     def blockface(self, onStreet, crossStreetOne, crossStreetTwo, borough,
@@ -161,8 +164,7 @@ class Geoclient(object):
         :param crossStreetTwo:
             Second cross street of blockface.
         :param borough:
-            The borough to look within.  Must be 'Bronx', 'Brooklyn',
-            'Manhattan', 'Queens', or 'Staten Island' (case-insensitive).
+            The borough to look within. Can be a valid Borough name, numeric value (1-5) or common borough abbreviation.
         :param boroughCrossStreetOne:
             (optional) Borough of first cross street. Defaults to value of
             borough parameter if not supplied.
@@ -175,6 +177,7 @@ class Geoclient(object):
 
         :returns: A dict with blockface-level information.
         """
+
         return self._request(u'blockface', onStreet=onStreet,
                              crossStreetOne=crossStreetOne,
                              crossStreetTwo=crossStreetTwo,
@@ -195,8 +198,8 @@ class Geoclient(object):
             Second cross street
         :param borough:
             Borough of first cross street or of all cross streets if no other
-            borough parameter is supplied. Must be 'Bronx', 'Brooklyn', 'Manhattan', 'Queens', or 'Staten
-            Island' or well known abbreviation.
+            borough parameter is supplied. Can be a valid Borough name, numeric value (1-5) or common borough
+            abbreviation.
         :param boroughCrossStreetTwo:
             (optional) Borough of second cross street. If not supplied, assumed
             to be same as borough parameter.  Must be 'Bronx', 'Brooklyn',
@@ -207,6 +210,7 @@ class Geoclient(object):
 
         :returns: A dict with intersection-level information.
         """
+
         return self._request(u'intersection', crossStreetOne=crossStreetOne,
                              crossStreetTwo=crossStreetTwo,
                              borough=borough,
@@ -220,11 +224,11 @@ class Geoclient(object):
         :param name:
             Place name of well-known NYC location.
         :param borough:
-            Must be 'Bronx', 'Brooklyn', 'Manhattan', 'Queens', or 'Staten
-            Island' or well known abbreviation.
+            The borough to look within. Can be a valid Borough name, numeric value (1-5) or common borough abbreviation.
 
         :returns: A dict with place-level information.
         """
+
         return self._request(u'place', name=name, borough=borough)
 
     def search(self,
@@ -237,13 +241,13 @@ class Geoclient(object):
                returnTokens=None,
                similarNamesDistance=None):
         """
-        From https://api.cityofnewyork.us/geoclient/v1/doc#section-1.3:
         Beginning with version 1.10, any of the six request types documented in section 1.2 can be accessed using a
         single unparsed location string. Assuming that the Geoclient parser can guess the location type requested and
         the given single-field input parameter contains contains enough information to generate a successful Geosupport
         call, the service will return one or more sets of geocodes corresponding to the type of request that was made.
-       :param input:
-            Unparsed location input.
+
+        :param input:
+             Unparsed location input.
         :param exactMatchForSingleSuccess:
             (optional) Whether a search returning only one possible successfully geocoded
             location is considered an exact match. Defaults to false.
@@ -265,8 +269,10 @@ class Geoclient(object):
             (optional) Maximum allowable Levenshtein distance between user input
             and a similar name suggestion from Geosupport. Defaults to 8.
             A higher number will allow more "guesses" to be made about an unrecognized street name.
+
         :returns: List of geocodes corresponding to the type of request that was made.
         """
+
         return self._request(u'search',
                              input=input,
                              exactMatchForSingleSuccess=exactMatchForSingleSuccess,

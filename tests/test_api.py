@@ -1,4 +1,4 @@
-from ..testcase import TestCase
+from .testcase import TestCase
 from .mock_responses import *
 
 try:
@@ -7,7 +7,7 @@ except ImportError:
     import mock  # python 2
 
 
-@mock.patch('nyc_geoclient.requests.get')
+@mock.patch('geoclient.requests.get')
 class TestApi(TestCase):
     def test_address(self, fake_get):
         fake_get.return_value.status_code = 200
@@ -125,3 +125,14 @@ class TestApi(TestCase):
         self.assertEqual(result[0]['request'], 'place [name=Empire State Building, borough=MANHATTAN, zip=null]')
         self.assertEqual(result[0]['response']['message'],
                          '350 5 AVENUE IS THE UNDERLYING ADDRESS OF EMPIRE STATE BUILDING')
+
+    def test_search_no_result(self, fake_get):
+        fake_get.return_value.status_code = 200
+        fake_get.return_value.json.return_value = {u'results': []}
+
+        result = self.geoclient.search(
+            'THIS VALUE RETURNS NO RESULT'
+        )
+        self.assertEqual(len(result), 0)
+
+

@@ -1,5 +1,6 @@
-from ..testcase import TestCase
-from nyc_geoclient.error import GeoclientError
+from .testcase import TestCase
+from .mock_responses import address_response_error
+from geoclient.error import GeoclientError
 
 try:
     from unittest import mock  # python 3
@@ -7,8 +8,8 @@ except ImportError:
     import mock  # python 2
 
 
-@mock.patch('nyc_geoclient.requests.get')
-class TestError(TestCase):
+@mock.patch('geoclient.requests.get')
+class TestResponseError(TestCase):
     def test_403(self, fake_get):
         fake_get.return_value.status_code = 403
         fake_get.return_value.reason = "Forbidden"
@@ -21,3 +22,11 @@ class TestError(TestCase):
         fake_get.return_value.status_code = None
         fake_get.return_value.reason = None
         self.assertRaises(GeoclientError, self.geoclient.search, "100 Gold Street")
+
+
+@mock.patch('geoclient.requests.get')
+class TestGeoclientMessageError(TestCase):
+    def test_address_error(self, fake_get):
+        fake_get.return_value.status_code = 200
+        fake_get.return_value.json.return_value = address_response_error
+        self.assertRaises(GeoclientError, self.geoclient.address, '125', 'Wort st', 1)

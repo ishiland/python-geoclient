@@ -7,36 +7,35 @@ except ImportError:
         "for installing setuptools"
     )
 
+config = {}
+
+with open("geoclient/config.py") as fp:
+    exec (fp.read(), config)
+
 extras = {'dev': []}
 
 try:
     from unittest import mock
 except ImportError:
-    extras['dev'].append('mock') # need to use mock for unit testing on python 2.7
-
-try:
-    from nyc_geoclient.config import __version__
-except ImportError:
-    print('config import error')
-    exec(open("nyc_geoclient/config.py").read())
+    extras['dev'].append('mock')  # need to use mock for unit testing on python 2.7
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-packages = ['nyc_geoclient']
 setup(
-    name='nyc_geoclient',
-    version=__version__,
-    description='Python bindings for the NYC Geoclient REST API',
+    name='python-geoclient',
+    version=config['__version__'],
+    description='Python wrapper for the NYC Geoclient RESTful API',
     long_description=long_description,
-    author='John Krauss',
-    author_email='john@accursedware.com',
-    url='http://github.com/talos/nyc-geoclient',
-    packages=packages,
+    long_description_content_type='text/markdown',
+    author=config['__author__'],
+    author_email='ishiland@gmail.com',
+    url='http://github.com/ishiland/python-geoclient',
+    packages=['geoclient'],
     license='BSD',
+    keywords=['NYC', 'geocoder', 'python-geoclient', 'geoclient'],
     classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
+        'Development Status :: 4 - Beta',
         'Topic :: Software Development',
         'Natural Language :: English',
         'License :: OSI Approved :: BSD License',
