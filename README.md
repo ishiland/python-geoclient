@@ -20,7 +20,7 @@ or you can clone this directory and:
 `$ python setup.py install`
 
 ### Quickstart
-Once your app has been registered with DoITT, using the API is simple:
+Once your app has been registered with [DoITT](http://www.nyc.gov/html/doitt/html/home/home.shtml), using the API is simple:
 
 ```python
 from geoclient import Geoclient
@@ -28,7 +28,7 @@ g = Geoclient('my app ID', 'my app key')
 ```
 
 
-You can use any of the available methods documented in the [API](https://python-geoclient.readthedocs.org/en/latest/api.html):
+You can use any of the available methods documented in the [API](https://python-geoclient.readthedocs.io/en/latest/API.html):
 ```python
 g.address(100, 'Gold st', 'MN')
 
