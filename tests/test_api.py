@@ -134,5 +134,3 @@ class TestApi(TestCase):
             'THIS VALUE RETURNS NO RESULT'
         )
         self.assertEqual(len(result), 0)
-
-

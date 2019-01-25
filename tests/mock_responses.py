@@ -40,24 +40,22 @@ search_response = {
                   u'response': {u'message': u'350 5 AVENUE IS THE UNDERLYING ADDRESS OF EMPIRE STATE BUILDING'},
                   u'geosupportReturnCode': u'00'}]}
 
-# full response
-address_response_error = {
-    u'address': {u'streetName7': u'WORLD TRADE CENTER EAST CNCRSE', u'streetName5': u'WORLD FINANCIAL CENTER SKYBRIDGE',
-                 u'streetCode5': u'10071901', u'streetCode4': u'10093601', u'streetCode7': u'14560116',
-                 u'streetCode6': u'14560101', u'streetCode1': u'11191501', u'streetCode3': u'14561201',
-                 u'streetCode2': u'14549001', u'reasonCode': u'A',
-                 u'message': u"'WORT ST' NOT RECOGNIZED. THERE ARE 010 SIMILAR NAMES.",
-                 u'streetName10': u'WORLD TRADE CENTER OCULUS', u'streetCode9': u'11394005',
-                 u'streetCode8': u'14560114', u'streetCode10': u'14560118',
-                 u'firstStreetNameNormalized': u'WORT STREET', u'streetName1In': u'WORT ST', u'boroughCode1In': u'1',
-                 u'message2': u"'WORT ST' NOT RECOGNIZED. THERE ARE 010 SIMILAR NAMES.", u'reasonCode1e': u'A',
-                 u'returnCode1a': u'EE', u'reasonCode1a': u'A', u'returnCode1e': u'EE',
-                 u'geosupportFunctionCode': u'1B', u'houseNumberSortFormat': u'000125000AA', u'reasonCode2': u'A',
-                 u'streetName6': u'WORLD TRADE CENTER', u'crossStreetNamesFlagIn': u'E',
-                 u'streetName4': u'WORLD FINANCIAL CENTER FERRY', u'streetName3': u'WORLD FINANCIAL CENTER',
-                 u'streetName2': u'WORTH STREET', u'streetName1': u'WORTH SQUARE', u'houseNumberIn': u'125',
-                 u'numberOfStreetCodesAndNamesInList': u'10', u'geosupportReturnCode': u'EE',
-                 u'streetName9': u'WORLD TRADE CENTER NORTH POOL', u'streetName8': u'WORLD TRADE CENTER NORTH CNCRSE',
-                 u'workAreaFormatIndicatorIn': u'C', u'houseNumber': u'125', u'firstBoroughName': u'MANHATTAN',
-                 u'geosupportReturnCode2': u'EE'}
+# 'message' and 'message2' are equal
+msg_equal = {
+    u'address': {u'message': u"'WORT ST' NOT RECOGNIZED. THERE ARE 010 SIMILAR NAMES.",
+                 u'message2': u"'WORT ST' NOT RECOGNIZED. THERE ARE 010 SIMILAR NAMES.",
+                 u'geosupportReturnCode': u'EE'}
+}
+
+# 'message' and 'message2' are unequal
+msg_unequal = {
+    u'address': {u'message': u"THIS IS THE FIRST MESSAGE.",
+                 u'message2': u"THIS IS THE SECOND MESSAGE",
+                 u'geosupportReturnCode': u'EE'}
+}
+
+# only 'message' returned
+msg_single = {
+    u'address': {u'message': u"'WORT ST' NOT RECOGNIZED. THERE ARE 010 SIMILAR NAMES.",
+                 u'geosupportReturnCode': u'EE'}
 }

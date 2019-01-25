@@ -1,11 +1,12 @@
 import os
+
 try:
     from configparser import ConfigParser  # Python 3
 except ImportError:
     from ConfigParser import ConfigParser  # Python 2
 import requests
 from geoclient.config import BASE_URL, USER_CONFIG
-from .error import GeoclientError
+from .error import GeoclientError, _format_return_message
 
 
 class Geoclient(object):
@@ -73,10 +74,16 @@ class Geoclient(object):
             result = r.json()[key]
 
             if isinstance(result, dict):
-                return_code = result['geosupportReturnCode']
-                if not return_code.isdigit() or int(return_code) > 1:
+                if 'geosupportReturnCode' in result:
+                    return_code = result['geosupportReturnCode']
+                    if not return_code.isdigit() or int(return_code) > 1:
+                        raise GeoclientError(
+                            _format_return_message(result),
+                            result
+                        )
+                else:
                     raise GeoclientError(
-                        result['message'] + ' ' + result['message2'],
+                        "No 'geosupportReturnCode' received from server.",
                         result
                     )
             return result
