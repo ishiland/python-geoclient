@@ -4,8 +4,8 @@
 Error Handling
 --------------
 
-`python-geoclient` will raise a ``GeoclientError`` when the Geoclient API returns an error code. Sometimes there is more information
-returned, in which case the exception will have a ``result`` dictionary.
+`python-geoclient` will raise a ``GeoclientError`` when the Geoclient API returns an error code. Sometimes there is more
+information returned, in which case the exception will have a ``result`` dictionary.
 
 .. code-block:: python
 
@@ -18,7 +18,7 @@ returned, in which case the exception will have a ``result`` dictionary.
         print(e) # 'WORT STREET' NOT RECOGNIZED. THERE ARE 010 SIMILAR NAMES.
         print(e.result['streetName1']) # WORTH SQUARE
 
-You can easily iterate all `similar names`:
+In this case, you can easily iterate all `similar names`:
 
 .. code-block:: python
 
@@ -35,4 +35,6 @@ You can easily iterate all `similar names`:
         for x in range(int(e.result['numberOfStreetCodesAndNamesInList'])):
             print(e.result['streetName{}'.format(x + 1)])
 
-**Note:** The ``GeoclientError`` will not be raised when using the ``search`` method.
+Some other things to know:
+ * The ``GeoclientError`` will not be raised from the results of the ``search`` method.
+ * Even if your geocode succeeds, the ``message`` or ``message2`` values can still provide useful information pertaining to your results.
