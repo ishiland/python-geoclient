@@ -1,7 +1,7 @@
 # Python-Geoclient
 Call the RESTful [NYC Geoclient API](http://developer.cityofnewyork.us/api/geoclient-api-beta) using python.
 
- [![Python 2.7 | 3.4+](https://img.shields.io/badge/python-2.7%20%7C%203.4+-blue.svg)](https://www.python.org/downloads/release/python-360/) [![Build Status](https://travis-ci.org/ishiland/nyc-geoclient.svg?branch=master)](https://travis-ci.org/ishiland/python-geoclient)  [![PyPI version](https://img.shields.io/pypi/v/python-geoclient.svg)](https://pypi.python.org/pypi/python-geoclient/)
+ [![Python 2.7 | 3.4+](https://img.shields.io/badge/python-2.7%20%7C%203.4+-blue.svg)](https://www.python.org/downloads/release/python-360/) [![Build Status](https://travis-ci.org/ishiland/python-geoclient.svg?branch=master)](https://travis-ci.org/ishiland/python-geoclient)  [![PyPI version](https://img.shields.io/pypi/v/python-geoclient.svg)](https://pypi.python.org/pypi/python-geoclient/)
 
 ### Introduction
 
